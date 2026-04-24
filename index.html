@@ -373,8 +373,17 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 // ── SUPABASE CONFIG ──────────────────────────────────────────
 const SUPABASE_URL = 'https://liickdzbkkzkjhcyrakh.supabase.co/rest/v1/';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxpaWNrZHpia2t6a2poY3lyYWtoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcwMjk1ODcsImV4cCI6MjA5MjYwNTU4N30.ozjbxD-KZEA3NhB1PHJYzxUP2OALiuZbXTtkA87A63Q';
-const { createClient } = supabase;
-const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// Lazy-init: never crash on load even if CDN is slow or URL is placeholder
+let _db = null;
+function getDB() {
+  if (!_db) {
+    if (typeof supabase === 'undefined') throw new Error('Supabase SDK not loaded — check your internet connection.');
+    const { createClient } = supabase;
+    _db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  }
+  return _db;
+}
 
 // ── MENU DATA (embedded — works offline) ─────────────────────
 const MENU_DATA = [{"item": "Slayer Shot - Espresso", "category": "Coffee", "netRate": 3.0, "menuRate": 17}, {"item": "Cappuccino", "category": "Coffee", "netRate": 4.0, "menuRate": 22}, {"item": "Spanish Latte", "category": "Coffee", "netRate": 5.0, "menuRate": 25}, {"item": "Emirati Latte", "category": "Coffee", "netRate": 5.0, "menuRate": 25}, {"item": "Coffee Latte", "category": "Coffee", "netRate": 5.0, "menuRate": 23}, {"item": "Americano", "category": "Coffee", "netRate": 3.0, "menuRate": 19}, {"item": "Flat White", "category": "Coffee", "netRate": 4.0, "menuRate": 21}, {"item": "Hot Chocolate", "category": "Coffee", "netRate": 5.0, "menuRate": 25}, {"item": "Macchiato", "category": "Coffee", "netRate": 4.0, "menuRate": 22}, {"item": "Mocha", "category": "Coffee", "netRate": 5.0, "menuRate": 25}, {"item": "Cortado", "category": "Coffee", "netRate": 4.0, "menuRate": 20}, {"item": "Piccolo", "category": "Coffee", "netRate": 4.0, "menuRate": 20}, {"item": "V60 - Columbia. Huila 720", "category": "Coffee", "netRate": 8.0, "menuRate": 45}, {"item": "V60 - Ethiopia. Chaka", "category": "Coffee", "netRate": 7.0, "menuRate": 35}, {"item": "V60 - Aalamin Bener Meriah .Peach", "category": "Coffee", "netRate": 7.0, "menuRate": 30}, {"item": "V60 - Aalamin Bener Meriah .Melon", "category": "Coffee", "netRate": 7.0, "menuRate": 30}, {"item": "Cold Brew", "category": "Coffee", "netRate": 4.0, "menuRate": 24}, {"item": "Aromatic Tea", "category": "Black Tea", "netRate": 0.5, "menuRate": 9}, {"item": "Green Tea", "category": "Black Tea", "netRate": 0.5, "menuRate": 9}, {"item": "Mint Tea", "category": "Black Tea", "netRate": 0.7, "menuRate": 15}, {"item": "Cinnamon Black Tea", "category": "Black Tea", "netRate": 0.7, "menuRate": 15}, {"item": "Saffron Black Tea", "category": "Black Tea", "netRate": 0.8, "menuRate": 15}, {"item": "Majestic Earl Grey", "category": "Specialty Tea", "netRate": 6.0, "menuRate": 15}, {"item": "Moroccan Mint Tea", "category": "Specialty Tea", "netRate": 5.0, "menuRate": 15}, {"item": "Ceremonial Matcha", "category": "Specialty Tea", "netRate": 5.0, "menuRate": 25}, {"item": "Organic Chamomile Cooler", "category": "Specialty Tea", "netRate": 5.0, "menuRate": 15}, {"item": "Hibiscus Tea", "category": "Specialty Tea", "netRate": 0.6, "menuRate": 25}, {"item": "Fresh Milk Tea", "category": "Milk Tea", "netRate": 0.5, "menuRate": 6}, {"item": "Fresh Milk Tea - Flask", "category": "Milk Tea", "netRate": 2.0, "menuRate": 9}, {"item": "Masala Milk Tea", "category": "Milk Tea", "netRate": 0.9, "menuRate": 8}, {"item": "Masala Milk Tea - Flask", "category": "Milk Tea", "netRate": 3.6, "menuRate": 12}, {"item": "Ginger Milk Tea", "category": "Milk Tea", "netRate": 0.7, "menuRate": 8}, {"item": "Ginger Milk Tea - Flask", "category": "Milk Tea", "netRate": 2.8, "menuRate": 12}, {"item": "Saffron Milk Tea", "category": "Milk Tea", "netRate": 1.8, "menuRate": 8}, {"item": "Saffron Milk Tea - Flask", "category": "Milk Tea", "netRate": 7.2, "menuRate": 12}, {"item": "Choco Wave", "category": "Milk Tea", "netRate": 1.3, "menuRate": 8}, {"item": "Choco Wave - Flask", "category": "Milk Tea", "netRate": 5.2, "menuRate": 12}, {"item": "Noon tea", "category": "Milk Tea", "netRate": 2.5, "menuRate": 10}, {"item": "Noon tea - Flask", "category": "Milk Tea", "netRate": 10.0, "menuRate": 15}, {"item": "Filter Tea", "category": "Milk Tea", "netRate": 1.8, "menuRate": 8}, {"item": "Filter Tea - Flask", "category": "Milk Tea", "netRate": 7.2, "menuRate": 12}, {"item": "Matcha Cloud", "category": "Cold Specialty", "netRate": 5.0, "menuRate": 28}, {"item": "Passion fruit mojito", "category": "Mojito", "netRate": 11.0, "menuRate": 23}, {"item": "Strawberry mojito", "category": "Mojito", "netRate": 11.0, "menuRate": 23}, {"item": "Lime-Mint mojito", "category": "Mojito", "netRate": 11.0, "menuRate": 23}, {"item": "Blueberry mojito", "category": "Mojito", "netRate": 11.0, "menuRate": 23}, {"item": "Raspberry Zesty Smoothies", "category": "Smoothie", "netRate": 6.0, "menuRate": 19}, {"item": "Mango Paradise Smoothies", "category": "Smoothie", "netRate": 6.0, "menuRate": 19}, {"item": "Fresh Mint Smoothies", "category": "Smoothie", "netRate": 6.0, "menuRate": 19}, {"item": "Fruit Trap", "category": "Smoothie", "netRate": 8.0, "menuRate": 24}, {"item": "Tropical Treat Smoothies", "category": "Smoothie", "netRate": 6.0, "menuRate": 19}, {"item": "Vanilla Milkshakes", "category": "Milk Shakes", "netRate": 12.0, "menuRate": 21}, {"item": "Banana Milkshakes", "category": "Milk Shakes", "netRate": 12.0, "menuRate": 21}, {"item": "Caramel Milkshakes", "category": "Milk Shakes", "netRate": 12.0, "menuRate": 21}, {"item": "Chocolate Milkshakes", "category": "Milk Shakes", "netRate": 12.0, "menuRate": 21}, {"item": "Hazelnut Cookies", "category": "Mini Bites", "netRate": 6.0, "menuRate": 14}, {"item": "Chocolate Cookies", "category": "Mini Bites", "netRate": 6.5, "menuRate": 12}, {"item": "Fresh Croissant", "category": "Mini Bites", "netRate": 2.5, "menuRate": 6}, {"item": "Butter Croissant", "category": "Mini Bites", "netRate": 3.0, "menuRate": 8}, {"item": "Almond Croissant", "category": "Mini Bites", "netRate": 5.0, "menuRate": 10}, {"item": "Stuffed Croissant", "category": "Mini Bites", "netRate": 5.0, "menuRate": 10}, {"item": "Caramel Pudding", "category": "Mini Bites", "netRate": 5.0, "menuRate": 10}, {"item": "Marble Cake", "category": "Mini Bites", "netRate": 7.0, "menuRate": 12}, {"item": "Banana Cake", "category": "Mini Bites", "netRate": 7.0, "menuRate": 10}, {"item": "Saffron Milk Cake", "category": "Mini Bites", "netRate": 11.0, "menuRate": 18}, {"item": "Molten Lava", "category": "Mini Bites", "netRate": 11.0, "menuRate": 18}, {"item": "Brownie", "category": "Mini Bites", "netRate": 5.0, "menuRate": 10}, {"item": "Lazy Cat", "category": "Mini Bites", "netRate": 13.0, "menuRate": 25}, {"item": "Sparkling Water", "category": "Water", "netRate": 3.125, "menuRate": 9}, {"item": "Brownston", "category": "Mini Bites", "netRate": 15.0, "menuRate": 30}, {"item": "Halloumi wtsp", "category": "Mini Bites", "netRate": 15.0, "menuRate": 30}, {"item": "Tiramisu", "category": "Mini Bites", "netRate": 15.0, "menuRate": 32}, {"item": "Almond Milk", "category": "Additional", "netRate": 3.5, "menuRate": 5}, {"item": "Oat Milk", "category": "Additional", "netRate": 3.5, "menuRate": 5}, {"item": "Coconut Milk", "category": "Additional", "netRate": 3.5, "menuRate": 5}];
@@ -414,7 +423,7 @@ async function syncPending(){
   for(const item of toSync){
     try{
       if(item.action==='recordOrder') await sbRecordOrder(item.rows);
-      else if(item.action==='addInventory') await db.from('inventory').insert(item.row);
+      else if(item.action==='addInventory') await getDB().from('inventory').insert(item.row);
       done++;
     }catch(e){}
   }
@@ -428,62 +437,62 @@ async function syncPending(){
 
 // ── USERS ─────────────────────────────────────────────────────
 async function sbCheckAnyUser(){
-  const {count} = await db.from('users').select('*',{count:'exact',head:true});
+  const {count} = await getDB().from('users').select('*',{count:'exact',head:true});
   return count > 0;
 }
 async function sbCreateUser(username,password,role){
   const hash = await sha256(password);
-  const {error} = await db.from('users').insert({username,password_hash:hash,role});
+  const {error} = await getDB().from('users').insert({username,password_hash:hash,role});
   if(error) throw new Error(error.code==='23505'?'Username already exists':error.message);
 }
 async function sbAuthUser(username,password){
   const hash = await sha256(password);
-  const {data,error} = await db.from('users').select('username,role').eq('username',username).eq('password_hash',hash).single();
+  const {data,error} = await getDB().from('users').select('username,role').eq('username',username).eq('password_hash',hash).single();
   if(error||!data) throw new Error('Invalid credentials');
   return data;
 }
 async function sbListUsers(){
-  const {data,error} = await db.from('users').select('username,role').order('username');
+  const {data,error} = await getDB().from('users').select('username,role').order('username');
   if(error) throw new Error(error.message);
   return data||[];
 }
 
 // ── MENU ──────────────────────────────────────────────────────
 async function sbSeedMenu(items){
-  await db.from('menu').delete().not('id','is',null);
-  const {error} = await db.from('menu').insert(items.map(m=>({item:m.item,category:m.category,net_rate:m.netRate,menu_rate:m.menuRate})));
+  await getDB().from('menu').delete().not('id','is',null);
+  const {error} = await getDB().from('menu').insert(items.map(m=>({item:m.item,category:m.category,net_rate:m.netRate,menu_rate:m.menuRate})));
   if(error) throw new Error(error.message);
 }
 
 // ── INVENTORY ─────────────────────────────────────────────────
 async function sbListInventory(){
-  const {data,error} = await db.from('inventory').select('*').order('name');
+  const {data,error} = await getDB().from('inventory').select('*').order('name');
   if(error) throw new Error(error.message);
   return (data||[]).map(r=>({id:r.id,name:r.name,quantity:r.quantity,unit:r.unit,unitCost:r.unit_cost,reorderThreshold:r.reorder_threshold,updatedAt:r.updated_at}));
 }
 async function sbAddInventory(p){
   const id='INV-'+Date.now();
-  const {error} = await db.from('inventory').insert({id,name:p.name,quantity:p.quantity||0,unit:p.unit,unit_cost:p.unitCost||0,reorder_threshold:p.reorderThreshold||0});
+  const {error} = await getDB().from('inventory').insert({id,name:p.name,quantity:p.quantity||0,unit:p.unit,unit_cost:p.unitCost||0,reorder_threshold:p.reorderThreshold||0});
   if(error) throw new Error(error.message);
   return id;
 }
 async function sbUpdateInventory(p){
-  const {error} = await db.from('inventory').update({name:p.name,quantity:p.quantity,unit:p.unit,unit_cost:p.unitCost||0,reorder_threshold:p.reorderThreshold||0,updated_at:new Date().toISOString()}).eq('id',p.id);
+  const {error} = await getDB().from('inventory').update({name:p.name,quantity:p.quantity,unit:p.unit,unit_cost:p.unitCost||0,reorder_threshold:p.reorderThreshold||0,updated_at:new Date().toISOString()}).eq('id',p.id);
   if(error) throw new Error(error.message);
 }
 async function sbDeleteInventory(id){
-  const {error} = await db.from('inventory').delete().eq('id',id);
+  const {error} = await getDB().from('inventory').delete().eq('id',id);
   if(error) throw new Error(error.message);
 }
 async function sbDecrementInventory(decrements){
   for(const dec of decrements){
-    await db.rpc('decrement_inventory',{inv_id:dec.id,qty_used:dec.qty});
+    await getDB().rpc('decrement_inventory',{inv_id:dec.id,qty_used:dec.qty});
   }
 }
 
 // ── RECIPES ───────────────────────────────────────────────────
 async function sbListRecipes(){
-  const {data,error} = await db.from('recipes').select('*').order('menu_item');
+  const {data,error} = await getDB().from('recipes').select('*').order('menu_item');
   if(error) throw new Error(error.message);
   const grouped={};
   (data||[]).forEach(r=>{
@@ -493,19 +502,19 @@ async function sbListRecipes(){
   return grouped;
 }
 async function sbAddRecipe(menuItem,lines){
-  await db.from('recipes').delete().eq('menu_item',menuItem);
+  await getDB().from('recipes').delete().eq('menu_item',menuItem);
   const rid='REC-'+Date.now();
-  const {error} = await db.from('recipes').insert(lines.map(l=>({recipe_id:rid,menu_item:menuItem,inventory_id:l.inventoryId,inventory_name:l.inventoryName,qty_per_unit:l.qty,unit:l.unit})));
+  const {error} = await getDB().from('recipes').insert(lines.map(l=>({recipe_id:rid,menu_item:menuItem,inventory_id:l.inventoryId,inventory_name:l.inventoryName,qty_per_unit:l.qty,unit:l.unit})));
   if(error) throw new Error(error.message);
 }
 async function sbDeleteRecipe(menuItem){
-  const {error} = await db.from('recipes').delete().eq('menu_item',menuItem);
+  const {error} = await getDB().from('recipes').delete().eq('menu_item',menuItem);
   if(error) throw new Error(error.message);
 }
 
 // ── ORDERS ────────────────────────────────────────────────────
 async function sbRecordOrder(rows){
-  const {error} = await db.from('orders').insert(rows.map(r=>({
+  const {error} = await getDB().from('orders').insert(rows.map(r=>({
     date:r.date,item:r.item,category:r.category,net_rate:r.netRate,qty:r.qty,
     menu_rate:r.menuRate,billed_price:r.billedPrice,profit:r.profit,
     customer_mode:r.customerMode,barista:r.barista,order_id:r.orderId,timestamp:r.timestamp
@@ -513,7 +522,7 @@ async function sbRecordOrder(rows){
   if(error) throw new Error(error.message);
 }
 async function sbListOrders(){
-  const {data,error} = await db.from('orders').select('*').order('timestamp',{ascending:false});
+  const {data,error} = await getDB().from('orders').select('*').order('timestamp',{ascending:false});
   if(error) throw new Error(error.message);
   return (data||[]).map(r=>({
     date:r.date,item:r.item,category:r.category,netRate:r.net_rate,qty:r.qty,
@@ -522,15 +531,15 @@ async function sbListOrders(){
   }));
 }
 async function sbDeleteOrder(orderId,item){
-  const {error} = await db.from('orders').delete().eq('order_id',orderId).eq('item',item);
+  const {error} = await getDB().from('orders').delete().eq('order_id',orderId).eq('item',item);
   if(error) throw new Error(error.message);
 }
 async function sbClearOrders(){
-  const {error} = await db.from('orders').delete().not('id','is',null);
+  const {error} = await getDB().from('orders').delete().not('id','is',null);
   if(error) throw new Error(error.message);
 }
 async function sbBulkImportOrders(rows){
-  const {error} = await db.from('orders').insert(rows.map(r=>({
+  const {error} = await getDB().from('orders').insert(rows.map(r=>({
     date:r.date||r.DATE,item:r.item||r.Item,category:r.category||r.Category,
     net_rate:parseFloat(r.netRate||r['Net Rate'])||0,qty:parseInt(r.qty||r.Qty)||1,
     menu_rate:parseFloat(r.menuRate||r['Menu Rate'])||0,
@@ -547,19 +556,30 @@ async function sbBulkImportOrders(rows){
 // ═══════════════════════════════════════════════════════════════
 // APP INIT & AUTH
 // ═══════════════════════════════════════════════════════════════
+function showBootstrap(){
+  document.getElementById('loginScreen').classList.add('hidden');
+  document.getElementById('bootstrapScreen').classList.remove('hidden');
+}
 window.onload = async function(){
   if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+  // URL param override: open app URL + ?setup to force bootstrap screen
+  if(new URLSearchParams(location.search).get('setup')!==null){showBootstrap();return;}
   const s=sessionStorage.getItem('jl_session');
   if(s){const u=JSON.parse(s);currentUser=u.username;currentRole=u.role;showMainApp();return;}
+  // Validate Supabase credentials before trying to connect
+  if(SUPABASE_URL.includes('YOUR_SUPABASE')||SUPABASE_ANON_KEY.includes('YOUR_SUPABASE')){
+    document.getElementById('bootstrapScreen').classList.remove('hidden');
+    document.getElementById('loginScreen').classList.add('hidden');
+    document.getElementById('bsError').textContent='Paste your Supabase URL and anon key into index.html first.';
+    document.getElementById('bsError').classList.remove('hidden');
+    return;
+  }
   try{
     const hasUser=await sbCheckAnyUser();
-    if(!hasUser){
-      document.getElementById('loginScreen').classList.add('hidden');
-      document.getElementById('bootstrapScreen').classList.remove('hidden');
-    }
+    if(!hasUser){showBootstrap();}
   }catch(e){
-    document.getElementById('loginScreen').classList.add('hidden');
-    document.getElementById('bootstrapScreen').classList.remove('hidden');
+    console.error('Supabase connection failed:',e.message);
+    showBootstrap();
   }
 };
 
